@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon server.js",
+    "worker": "node Worker/worker.js"
   },
   "keywords": [],
   "author": "",
@@ -12,8 +14,10 @@
   "dependencies": {
     "axios": "^1.13.2",
     "body-parser": "^2.2.2",
+    "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.1.4"
+    "mongoose": "^9.1.4",
+    "nodemon": "^3.1.11"
   }
 }

@@ -32,10 +32,16 @@ router.patch('/:id/status', auth, async (req, res) => {
   if (task.assigned_node_id !== req.node_id)
     return res.status(403).json({ error: 'Unauthorized' });
 
+  // ✅ IDENTITY CHECK (IDEMPOTENCY CORE)
+  if (task.status === req.body.status) {
+    return res.json(task); // NO-OP, SAFE RETRY
+  }
+
   const allowed = {
     pending: ['in_progress'],
     in_progress: ['completed', 'failed']
   };
+console.log(allowed[task.status], req.body.status,task.status,allowed[task.status]?.includes(req.body.status),"<<<");
 
   if (!allowed[task.status]?.includes(req.body.status)) {
     return res.status(400).json({ error: 'Invalid status transition' });
@@ -45,6 +51,7 @@ router.patch('/:id/status', auth, async (req, res) => {
   await task.save();
   res.json(task);
 });
+
 
 /* ✅ THIS LINE IS CRITICAL */
 module.exports = router;

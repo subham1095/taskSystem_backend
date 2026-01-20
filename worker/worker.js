@@ -1,7 +1,7 @@
 const axios = require('axios');
 
 const API_BASE = 'http://localhost:3000';
-const TOKEN ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub2RlX2lkIjoibm9kZS0xMjM0NTY3IiwiaWF0IjoxNzY4NzQ3OTkzLCJleHAiOjE3Njg3NTE1OTN9.bWNVPtc_nU8BmnilqKhElYC-cX4XIhntYwYr3u95bks';
+const TOKEN ='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub2RlX2lkIjoibm9kZS1pbnByb2dyZXNzIiwiaWF0IjoxNzY4OTIzMDk2LCJleHAiOjE3Njg5MjY2OTZ9.3a4x02xjkgTM08KmlxgRIBtdTH8lNBfmEBsdiTwAa1Q';
 
 const axiosClient = axios.create({
   baseURL: API_BASE,

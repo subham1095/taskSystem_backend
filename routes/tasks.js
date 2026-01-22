@@ -15,6 +15,7 @@ router.post('/', async (req, res) => {
   res.json(task);
 });
 
+
 /* Fetch Tasks for Node */
 router.get('/', auth, async (req, res) => {
   const tasks = await Task.find({

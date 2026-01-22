@@ -3,44 +3,76 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const connectDB = require('./config/db');
-const tasksRouter = require('./routes/tasks');
-const authRouter = require('./routes/auth');
-const Task = require('./models/Task');
+
+// Routers
+const taskRouter = require('./routes/task1');   // contains nodes + tasks
+const authRouter = require('./routes/auth');    // node login
+
+// Models
+const Models = require('./models');
+const Task = Models.Task;
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-/* ---------------- Middleware ---------------- */
+/* ============================
+   MIDDLEWARE
+============================ */
 app.use(bodyParser.json());
 
-/* ---------------- Database ---------------- */
+/* ============================
+   DATABASE
+============================ */
 connectDB();
 
-/* ---------------- Routes ---------------- */
-app.use('/tasks', tasksRouter);
+/* ============================
+   ROUTES
+============================ */
+
+// Node authentication
 app.use('/auth', authRouter);
 
-/* ---------------- Health Check ---------------- */
+// Nodes + Tasks APIs
+app.use('/', taskRouter);
+
+// Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'UP' });
 });
 
-/* ---------------- Failover / Timeout Job ---------------- */
+/* ============================
+   FAILOVER / TIMEOUT JOB
+============================ */
+/**
+ * Marks tasks as failed if:
+ * - status = in_progress
+ * - lock_expires_at is expired
+ */
 setInterval(async () => {
-  const expiredTasks = await Task.updateMany(
-    {
-      status: 'in_progress',
-      lock_expires_at: { $lt: Date.now() }
-    },
-    { status: 'failed' }
-  );
+  try {
+    const result = await Task.updateMany(
+      {
+        status: 'in_progress',
+        lock_expires_at: { $lt: Date.now() }
+      },
+      {
+        $set: { status: 'failed' }
+      }
+    );
 
-  if (expiredTasks.modifiedCount > 0) {
-    console.log(`⚠️ Marked ${expiredTasks.modifiedCount} task(s) as failed due to timeout`);
+    if (result.modifiedCount > 0) {
+      console.log(
+        `⚠️ Marked ${result.modifiedCount} task(s) as failed due to timeout`
+      );
+    }
+  } catch (err) {
+    console.error('❌ Failover job error:', err.message);
   }
 }, 60 * 1000);
 
-/* ---------------- Start Server ---------------- */
+/* ============================
+   START SERVER
+============================ */
 app.listen(PORT, () => {
   console.log(`🚀 Task Server running on http://localhost:${PORT}`);
 });
